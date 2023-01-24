@@ -1,6 +1,14 @@
 const path = require('path');
+const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+
+let htmlPlugins = glob.sync('./src/views/*').map(templatePath => {
+    return new HtmlWebpackPlugin({
+        template: templatePath,
+        filename: path.parse(templatePath).name + '.html',
+    });
+});
 
 module.exports = {
     entry: './src/index.js',
@@ -25,19 +33,13 @@ module.exports = {
                 test: /\.s[ac]ss$/i,
                 use: ["style-loader","css-loader","sass-loader"],
             },
+            {
+                test: /\.(njk|nunjucks)$/i,
+                use: ["simple-nunjucks-loader"],
+            },
         ],
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            template: './src/views/index.html'
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'about.html',
-            template: './src/views/about.html'
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'contacts.html',
-            template: './src/views/contacts.html'
-        })
+       ...htmlPlugins,
     ],
 };
