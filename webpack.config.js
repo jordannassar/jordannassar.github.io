@@ -1,12 +1,17 @@
 const path = require('path');
 const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const fetch = require('sync-fetch');
 
-
-let htmlPlugins = glob.sync('./src/views/*').map(templatePath => {
+let htmlPlugins = glob.sync('./src/views/*', {nodir: true}).map(templatePath => {
+    let res = fetch('https://api.chucknorris.io/jokes/random');
     return new HtmlWebpackPlugin({
         template: templatePath,
         filename: path.parse(templatePath).name + '.html',
+        templateParameters: {
+            hello: 'some cool variable',
+            joke: res.json().value
+        },
     });
 });
 
