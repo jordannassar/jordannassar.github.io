@@ -1,6 +1,9 @@
 const path = require('path');
+const glob = require("glob");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
+const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
     entry: './src/index.js',
@@ -24,6 +27,10 @@ module.exports = {
             {
                 test: /\.s[ac]ss$/i,
                 use: [MiniCssExtractPlugin.loader,"css-loader","sass-loader"],
+            },
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader'
             }
         ],
     },
@@ -31,6 +38,10 @@ module.exports = {
        new HtmlWebpackPlugin({
         template: './src/index.html'
        }),
-       new MiniCssExtractPlugin()
+       new MiniCssExtractPlugin(),
+    //    new PurgeCSSPlugin({
+    //     paths: glob.sync(`./src/**/*`, { nodir: true }),
+    //   }),
+       new VueLoaderPlugin(),
     ],
 };
