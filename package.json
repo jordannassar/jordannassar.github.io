@@ -25,6 +25,7 @@
   "devDependencies": {
     "css-loader": "^6.7.3",
     "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.7.2",
     "sass": "^1.57.1",
     "sass-loader": "^13.2.0",
     "simple-nunjucks-loader": "^3.2.0",
@@ -35,6 +36,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "bulma": "^0.9.4",
     "surge": "^0.23.1"
   }
 }

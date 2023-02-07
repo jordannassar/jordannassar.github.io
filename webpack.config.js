@@ -1,19 +1,6 @@
 const path = require('path');
-const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const fetch = require('sync-fetch');
-
-let htmlPlugins = glob.sync('./src/views/*', {nodir: true}).map(templatePath => {
-    let res = fetch('https://api.chucknorris.io/jokes/random');
-    return new HtmlWebpackPlugin({
-        template: templatePath,
-        filename: path.parse(templatePath).name + '.html',
-        templateParameters: {
-            hello: 'some cool variable',
-            joke: res.json().value
-        },
-    });
-});
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     entry: './src/index.js',
@@ -36,15 +23,14 @@ module.exports = {
             },
             {
                 test: /\.s[ac]ss$/i,
-                use: ["style-loader","css-loader","sass-loader"],
-            },
-            {
-                test: /\.(njk|nunjucks)$/i,
-                use: ["simple-nunjucks-loader"],
-            },
+                use: [MiniCssExtractPlugin.loader,"css-loader","sass-loader"],
+            }
         ],
     },
     plugins: [
-       ...htmlPlugins,
+       new HtmlWebpackPlugin({
+        template: './src/index.html'
+       }),
+       new MiniCssExtractPlugin()
     ],
 };

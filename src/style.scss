@@ -1,4 +1,7 @@
+@charset "utf-8";
 $bgcolor: blue;
 html {
     background-color: lighten($bgcolor, 10%);
 }
+
+@import "~bulma/bulma";

@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Default Title{% endblock %}</title>
+    <title>Document</title>
 </head>
 <body>
-    {% include 'src/views/partials/nav.njk' %}
-    {{ joke }}
-    {% block content %}
-    {% endblock %}
+    <div class="container">
+        <section class="section">
+            <button class="button is-primary">Click me</button>
+        </section>
+    </div>
 </body>
 </html>
