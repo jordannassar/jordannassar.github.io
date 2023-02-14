@@ -1,54 +1,115 @@
 <template>
     <div class="container">
-        <section class="section">
-            <div class="content">
-                <input type="text" class="input" v-model="message">
-                <button class="button is-primary" @click="add()">Add</button>
-
-                <ItemList title="All Items" :items="items"></ItemList>
-                <ItemList title="Done Items" :items="doneItems"></ItemList>
-                <ItemList title="Not Done Items" :items="notDoneItems"></ItemList>
+        <section class="section" v-if="!hasUsername">
+            <div class="field has-addons">
+                <div class="control is-fullwidth">
+                    <input 
+                        class="input"
+                        type="text"
+                        placeholder="Username"
+                        v-model="username"
+                        @keydown.enter="sendUsername">
+                </div>
+                <div class="control">
+                    <a class="button is-info" @click="sendUsername">
+                    Enter
+                    </a>
+                </div>
             </div>
         </section>
-    </div>
+    
+
+    <section class="section" v-if="hasUsername">
+        <div class="field has-addons">
+            <div class="control is-fullwidth">
+                <input 
+                    class="input"
+                    type="text"
+                    placeholder="Message...."
+                    v-model="message"
+                    @keydown.enter="sendMessage">
+            </div>
+            <div class="control">
+                <a class="button is-info" @click="sendMessage">
+                Send
+                </a>
+            </div>
+        </div>
+    </section>
+    <section class="section" v-if="hasUsername">
+        <Message 
+            v-for="msg in messages"
+            :message="msg.message"
+            :isOwner="msg.isOwner"
+            :username="msg.username"></Message>
+    </section>
+</div>
 </template>
 
 <script>
-import ItemList from './ItemList.vue';
+import Message from './Message.vue';
 
 export default {
-    components: { ItemList },
+    created() {
+        // Create WebSocket connection.
+        this.socket = new WebSocket("ws://172.18.25.10:8080");
+        // Connection opened
+        this.socket.addEventListener("open", this.open);
+        // Listen for messages
+        this.socket.addEventListener("message", this.receive);
+    },
     data() {
         return {
             message: "",
-            items: [
-                { title: "Piim", isDone: true, id: crypto.randomUUID() },
-                { title: "Viin", isDone: false, id: crypto.randomUUID() },
-                { title: "Sai", isDone: true, id: crypto.randomUUID() },
-                { title: "Õlu", isDone: false, id: crypto.randomUUID() },
-                { title: "Burks", isDone: false, id: crypto.randomUUID() },
-            ],
+            messages: [],
+            socket: null,
+            username: '',
+            hasUsername: false
         };
     },
     methods: {
-        add() {
-            if (this.message.length !== 0) {
-                this.items.push({ title: this.message, isDone: false, id: crypto.randomUUID() });
-                this.message = "";
+        open(event) {
+            //this.socket.send('Hello Server!');
+        },
+        receive(event) {
+            let data = JSON.parse(event.data);
+            console.log("Message from server ", data);
+            if(data.type === 'message'){
+                this.messages.push({
+                    message: data.value.message,
+                    isOwner: false,
+                    username: data.value.username
+                });
             }
+            
+        },
+        sendMessage() {
+            this.send({type: 'message', value: this.message});
+            this.messages.push({
+                message: this.message,
+                isOwner: true,
+                username: this.username
+            });
+            this.message = "";
+        },
+        sendUsername(){
+            this.send({type: 'username', value: this.username});
+            this.hasUsername = true;
+        },
+        send(data){
+            this.socket.send(JSON.stringify(data));
         }
+
     },
-    computed: {
-        doneItems() {
-            return this.items.filter(item => item.isDone);
-        },
-        notDoneItems() {
-            return this.items.filter(item => !item.isDone);
-        },
-    }
+    components: { Message }
 };
 </script>
 
-<style>
-
+<style scoped>
+    .control.is-fullwidth {
+        width: 100%;
+    }
+    .is-halfwidth {
+        width: 50%;
+    }
 </style>
